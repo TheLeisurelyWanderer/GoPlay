@@ -652,10 +652,10 @@ async def handle_client(websocket, engines: dict):
                         ownership = parse_ownership(response, a_size)
                         if not analysis:
                             log.warning(f"NO candidates parsed! response[:500]: {response[:500]}")
-                        # kata-analyze returns winrate/scoreLead from the
-                        # perspective of the analyzed color.  Normalize to
-                        # Black's perspective so the client doesn't have to
-                        # know which color was analyzed.
+                        # kata-analyze with default SIDETOMOVE perspective
+                        # returns values from the current player's POV.
+                        # Normalize winrate/score to Black's perspective,
+                        # and ownership to absolute (neg=black, pos=white).
                         if color == "W":
                             for m in analysis:
                                 if "winrate" in m:
@@ -666,6 +666,15 @@ async def handle_client(websocket, engines: dict):
                                     m["scoreSelfplay"] = -m["scoreSelfplay"]
                                 if "utility" in m:
                                     m["utility"] = -m["utility"]
+                            # Ownership when White to move: pos=White,
+                            # neg=Black — already absolute convention.
+                        if color == "B" and ownership:
+                            # Ownership when Black to move: pos=Black,
+                            # neg=White — negate to get absolute convention
+                            # (neg=black, pos=white).
+                            ownership = [
+                                [-v for v in row] for row in ownership
+                            ]
                         msg_out = {
                             "type": "analysis",
                             "moves": analysis,

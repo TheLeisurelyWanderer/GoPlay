@@ -228,6 +228,12 @@
       font-weight: 600;
     }
 
+    .score-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
     /* Mode selector */
     .mode-selector {
       display: flex;
@@ -636,7 +642,10 @@
       <div class="score-card">
         <h2 id="score-title">Game Over</h2>
         <div id="score-details"></div>
-        <button class="ctrl-btn" id="close-score-btn">New Game</button>
+        <div class="score-buttons">
+          <button class="ctrl-btn" id="dismiss-score-btn">Dismiss</button>
+          <button class="ctrl-btn" id="close-score-btn">New Game</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1746,6 +1755,10 @@
           e.target.value = ''; // Reset so same file can be loaded again
         });
         document.getElementById('close-score-btn').addEventListener('click', () => this.newGame(this.game.size));
+        document.getElementById('dismiss-score-btn').addEventListener('click', () => this.hideScore());
+        document.getElementById('score-overlay').addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) this.hideScore();
+        });
 
         // Analysis controls — Analyze button toggles panel and starts auto-analyze
         document.getElementById('analyze-btn').addEventListener('click', () => this.toggleAnalysis());
